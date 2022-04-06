@@ -1,0 +1,14 @@
+FROM php:8.1-apache
+
+RUN apt-get update && apt-get install -y && rm -rf /var/lib/apt/lists/*
+
+RUN curl -sSLf \
+        -o /usr/local/bin/install-php-extensions \
+        https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && \
+    chmod +x /usr/local/bin/install-php-extensions && \
+    install-php-extensions gd xdebug fileinfo zip exif mysqli pdo_mysql mcrypt opcache pcntl mbstring iconv
+
+
+WORKDIR /var/www/
+
+RUN chown -R www-data:www-data /var/www/

@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  php-apache:
+    restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: apache.docker
+    ports:
+      - '8085:80'
+    volumes:
+      - ./src:/var/www/
+      - ./backend/apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
+    depends_on:
+      - database
+      - mailer
+
+  php-cli:
+    restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: cli.docker
+    volumes:
+      - ./src:/var/www/
+    depends_on:
+      - database
+      - mailer
+    tty: true
+
+  database:
+      image: mysql:5.7
+      restart: unless-stopped
+      volumes:
+          - ./storage-data:/var/lib/mysql
+      environment:
+          - "MYSQL_ROOT_PASSWORD=secret"
+          - "MYSQL_USER=app"
+          - "MYSQL_PASSWORD=secret"
+          - "MYSQL_DATABASE=app"
+      ports:
+          - "3308:3306"
+
+  database2:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: unless-stopped
+    ports:
+      - '8089:80'
+    environment:
+      PMA_HOST: database
+    depends_on:
+      - database
+
+  mailer:
+      image: mailhog/mailhog
+      restart: unless-stopped
+      ports:
+          - "1025:1025"
+          - "8082:8025"
+
+volumes:
+  db_data: {}

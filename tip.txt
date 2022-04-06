@@ -1,0 +1,62 @@
+docker build -t new_image_phpmyadmin .
+docker run --name container_phpmyadmin -p 8080:80 new_image_phpmyadmin
+docker run --name container_phpmyadmin2 -p 8081:80 phpmyadmin
+docker container exec -it container_phpmyadmin2 bash
+-----
+docker run === docker create & docker start
+docker create --name container_phpmyadmin2 -p 8081:80 phpmyadmin
+
+docker start {ID} or {NAME}
+docker stop container_phpmyadmin2
+docker kill container_phpmyadmin2
+docker rm container_phpmyadmin2
+
+-----
+
+\\wsl$\docker-desktop-data\version-pack-data\community\docker\volumes
+docker volume create my-storage
+
+docker run -v my-storage:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=secret mysql
+
+docker run -v C:\Users\ausov\Desktop\docker_project\2\storage:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=secret mysql
+
+-----
+
+docker volume create database_storage
+docker network create network_1
+
+docker run -d --rm --name test_mysql -p 3307:3306 -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=user -e MYSQL_PASSWORD=dbsecret -v database_storage:/var/lib/mysql --net network_1 mysql
+
+docker run -d --rm -p 8081:80 -e PMA_HOST=test_mysql --name test-phpmyadmin --net network_1 phpmyadmin:latest
+docker run -d --rm -p 8081:80 -e PMA_HOST=172.18.0.2:3306 --name test-phpmyadmin --net network_1 phpmyadmin:latest
+
+docker container inspect test_mysql
+
+
+-----
+--interactive,-i - Держать STDIN (стандартный поток ввода) открытым, даже если он не подключен
+--tty,-t - Выделить псевдо-TTY, устройство которое имеет функции физического терминала
+
+docker run --rm --name testbox busybox
+docker run -it --rm --name testbox busybox
+docker container exec -it testbox sh
+docker container top testbox
+
+docker run -i --rm --name testbox busybox
+docker run -t --rm --name testbox busybox
+
+
+-----
+
+docker build -t php_example .
+docker run --rm --name example php_example
+docker container top example
+docker stats example
+
+
+-----
+
+docker-compose build
+docker-compose up
+docker-compose down
+docker-compose exec php-cli php -v
